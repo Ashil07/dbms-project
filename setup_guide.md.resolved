@@ -1,0 +1,189 @@
+# 🚀 Cloth Rental System – Complete Setup Guide
+
+## Project Structure
+
+```
+cloth-rental/
+├── server.js                  # Express entry point
+├── package.json               # Backend dependencies
+├── prisma/
+│   └── schema.prisma          # Database schema
+├── config/
+│   ├── cloudinary.js          # Cloudinary + Multer setup
+│   └── prisma.js              # Prisma client singleton
+├── controllers/               # Business logic
+├── routes/                    # Express routers
+├── .env                       # Environment variables ← FILL THIS IN
+└── client/                    # React + Vite frontend
+    ├── vite.config.js         # Proxy to :3000
+    ├── src/
+    │   ├── App.jsx
+    │   ├── api/axios.js       # All API calls
+    │   ├── components/        # Navbar, ItemCard, Modal
+    │   └── pages/             # Home, Browse, RentPage, UploadItem, PaymentPage, RentalsPage
+```
+
+---
+
+## Step 1 – Setup External Services
+
+### A. Neon DB (PostgreSQL)
+
+1. Go to → https://neon.tech and create a free account
+2. Create a new Project → give it a name (e.g. `cloth-rental`)
+3. Go to **Dashboard → Connection String**
+4. Copy the **"Pooled connection"** string that looks like:
+   ```
+   postgresql://user:password@host/dbname?sslmode=require
+   ```
+
+### B. Cloudinary
+
+1. Go to → https://cloudinary.com and create a free account
+2. Go to **Dashboard**
+3. Copy:
+   - **Cloud Name**
+   - **API Key**
+   - **API Secret**
+
+---
+
+## Step 2 – Configure Environment Variables
+
+Open [cloth-rental/.env](file:///c:/Users/ADMIN/cloth-rental/.env) and fill in your real values:
+
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@HOST/DATABASE?sslmode=require"
+CLOUDINARY_CLOUD_NAME="your_cloud_name"
+CLOUDINARY_API_KEY="your_api_key"
+CLOUDINARY_API_SECRET="your_api_secret"
+PORT=3000
+```
+
+> ⚠️ **Never commit [.env](file:///c:/Users/ADMIN/cloth-rental/.env) to Git.** It's already in [.gitignore](file:///c:/Users/ADMIN/cloth-rental/.gitignore).
+
+---
+
+## Step 3 – Run Prisma Migration
+
+Open a terminal in `cloth-rental/`:
+
+```powershell
+npx prisma generate
+npx prisma migrate dev --name init
+```
+
+This will:
+- Generate Prisma Client
+- Create all tables in your Neon DB
+
+You can inspect the database with:
+```powershell
+npx prisma studio
+```
+
+---
+
+## Step 4 – Seed Initial Data (Required!)
+
+Before using the app, you need at least one **Category** and **ClothType** so you can add items.
+
+Use a REST client (curl, Postman, or Thunder Client) or the Prisma Studio:
+
+```bash
+# Create a Category
+curl -X POST http://localhost:3000/api/categories \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Traditional", "description": "Traditional Indian wear"}'
+
+# Create a ClothType (use categoryId from the response above)
+curl -X POST http://localhost:3000/api/categories/cloth-types \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Saree", "categoryId": 1}'
+
+# Create a User
+curl -X POST http://localhost:3000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name": "John Doe", "email": "john@example.com", "password": "securepassword"}'
+```
+
+---
+
+## Step 5 – Start the Application
+
+### Option A: Run Both Together (Recommended)
+
+```powershell
+npm run dev:all
+```
+
+This uses `concurrently` to start:
+- **Backend** (Express) → http://localhost:3000
+- **Frontend** (React/Vite) → http://localhost:5173
+
+### Option B: Run Separately
+
+**Terminal 1 – Backend:**
+```powershell
+npm run dev
+```
+
+**Terminal 2 – Frontend:**
+```powershell
+cd client
+npm run dev
+```
+
+Then open → **http://localhost:5173** in your browser.
+
+---
+
+## API Reference
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/items` | List all items (supports `?search=`, `?available=true/false`, `?page=`, `?limit=`) |
+| `POST` | `/api/items` | Add item with image (`multipart/form-data`) |
+| `PUT` | `/api/items/:id` | Update item |
+| `DELETE` | `/api/items/:id` | Delete item |
+| `GET` | `/api/rentals` | List all rentals |
+| `POST` | `/api/rentals` | Create rental |
+| `PATCH` | `/api/rentals/:id/return` | Return a rented item |
+| `GET` | `/api/payments` | List all payments |
+| `POST` | `/api/payments` | Record payment |
+| `PATCH` | `/api/payments/:id/refund` | Refund payment |
+| `GET` | `/api/categories` | List categories |
+| `POST` | `/api/categories` | Create category |
+| `GET` | `/api/categories/cloth-types` | List cloth types |
+| `POST` | `/api/categories/cloth-types` | Create cloth type |
+| `POST` | `/api/users` | Register user |
+| `GET` | `/api/users` | List users |
+| `POST` | `/api/coupons` | Create coupon |
+| `POST` | `/api/coupons/validate` | Validate coupon |
+| `POST` | `/api/reviews` | Add review |
+| `GET` | `/api/health` | Health check |
+
+---
+
+## Frontend Pages
+
+| Route | Page | Features |
+|-------|------|----------|
+| `/` | **Home** | Hero section, live stats, featured items, item modal |
+| `/browse` | **Browse** | Search, filter by availability, pagination, item modal |
+| `/rent` | **Rent** | Item selector, date picker, coupon, price summary |
+| `/upload` | **List Item** | Drag & drop image upload → Cloudinary |
+| `/rentals` | **Rentals** | All rentals table, status filter, return action |
+| `/payment` | **Payment** | Record payment, recent payments table |
+
+---
+
+## Troubleshooting
+
+| Issue | Fix |
+|-------|-----|
+| `P1001: Can't reach database` | Check `DATABASE_URL` in [.env](file:///c:/Users/ADMIN/cloth-rental/.env) and Neon DB active |
+| `Cloudinary 401` | Check API key and secret in [.env](file:///c:/Users/ADMIN/cloth-rental/.env) |
+| CORS error | Backend must be on port 3000; Vite proxy handles it |
+| Images not uploading | Ensure `streamifier` is installed: `npm install` |
+| `prisma: command not found` | Run `npx prisma generate` instead |

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloth Rental System – Rent Fashion, Live Stylish</title>
+  <meta name="description" content="Browse and rent premium clothing for any occasion. Upload your items, rent with ease, and track everything in one place." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo" id="nav-logo-link">
+        <span class="logo-icon">👗</span>
+        <span class="logo-text">ThreadRent</span>
+      </a>
+      <div class="nav-links">
+        <a href="#" class="nav-link active" data-section="home" id="nav-home">Home</a>
+        <a href="#" class="nav-link" data-section="items" id="nav-items">Browse</a>
+        <a href="#" class="nav-link" data-section="rent" id="nav-rent">Rent</a>
+        <a href="#" class="nav-link" data-section="upload" id="nav-upload">List Item</a>
+        <a href="#" class="nav-link" data-section="payment" id="nav-payment">Payment</a>
+      </div>
+      <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu">&#9776;</button>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="#" class="mobile-link" data-section="home">Home</a>
+      <a href="#" class="mobile-link" data-section="items">Browse</a>
+      <a href="#" class="mobile-link" data-section="rent">Rent</a>
+      <a href="#" class="mobile-link" data-section="upload">List Item</a>
+      <a href="#" class="mobile-link" data-section="payment">Payment</a>
+    </div>
+  </nav>
+
+  <main class="main-content" id="main-content">
+
+    <!-- ======================== HOME SECTION ======================== -->
+    <section class="section active" id="section-home">
+      <div class="hero">
+        <div class="hero-content">
+          <div class="hero-badge">✨ Premium Cloth Rental</div>
+          <h1 class="hero-title">Wear It Once,<br /><span class="gradient-text">Return It Twice.</span></h1>
+          <p class="hero-subtitle">Browse thousands of premium outfits, rent for any occasion, and return when done. Sustainable fashion, affordable style.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="hero-browse-btn">Browse Items</button>
+            <button class="btn btn-outline" id="hero-list-btn">List Your Item</button>
+          </div>
+          <div class="hero-stats">
+            <div class="stat"><span class="stat-num" id="stat-items">0</span><span class="stat-label">Items</span></div>
+            <div class="stat-divider"></div>
+            <div class="stat"><span class="stat-num" id="stat-rentals">0</span><span class="stat-label">Rentals</span></div>
+            <div class="stat-divider"></div>
+            <div class="stat"><span class="stat-num" id="stat-users">0</span><span class="stat-label">Users</span></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-card-stack">
+            <div class="floating-card card-1">
+              <div class="fc-icon">👘</div>
+              <div class="fc-text">Sarees</div>
+            </div>
+            <div class="floating-card card-2">
+              <div class="fc-icon">🥻</div>
+              <div class="fc-text">Lehengas</div>
+            </div>
+            <div class="floating-card card-3">
+              <div class="fc-icon">🤵</div>
+              <div class="fc-text">Suits</div>
+            </div>
+            <div class="central-orb">
+              <span>👗</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Items -->
+      <div class="section-header">
+        <h2 class="section-title">Featured Items</h2>
+        <button class="btn btn-sm btn-outline" id="home-see-all-btn">See All</button>
+      </div>
+      <div class="items-grid" id="featured-items-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </section>
+
+    <!-- ======================== BROWSE SECTION ======================== -->
+    <section class="section" id="section-items">
+      <div class="section-header">
+        <h2 class="section-title">Browse Clothing</h2>
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" class="search-input" placeholder="Search items..." />
+          </div>
+          <select class="filter-select" id="filter-available">
+            <option value="">All Items</option>
+            <option value="true">Available Only</option>
+            <option value="false">Rented Out</option>
+          </select>
+        </div>
+      </div>
+      <div class="items-grid" id="all-items-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+      <div class="pagination" id="items-pagination"></div>
+    </section>
+
+    <!-- ======================== RENT SECTION ======================== -->
+    <section class="section" id="section-rent">
+      <div class="form-page">
+        <div class="form-header">
+          <h2 class="section-title">Rent an Item</h2>
+          <p class="form-desc">Fill in the details to rent your chosen outfit.</p>
+        </div>
+        <form class="rental-form glass-form" id="rent-form" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="rent-user-id">User ID</label>
+              <input type="number" id="rent-user-id" class="form-input" placeholder="Enter your user ID" required />
+            </div>
+            <div class="form-group">
+              <label for="rent-item-select">Select Item</label>
+              <select id="rent-item-select" class="form-input" required>
+                <option value="">-- Choose an item --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="rent-start">Start Date</label>
+              <input type="date" id="rent-start" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label for="rent-end">End Date</label>
+              <input type="date" id="rent-end" class="form-input" required />
+            </div>
+            <div class="form-group full-width">
+              <label for="rent-coupon">Coupon Code (Optional)</label>
+              <div class="input-with-btn">
+                <input type="text" id="rent-coupon" class="form-input" placeholder="Enter coupon code" />
+                <button type="button" class="btn btn-sm btn-outline" id="validate-coupon-btn">Apply</button>
+              </div>
+              <div id="coupon-feedback" class="feedback-msg"></div>
+            </div>
+          </div>
+          <div class="rent-summary" id="rent-summary" style="display:none;">
+            <div class="summary-row"><span>Rental Price/Day:</span><span id="summary-price">—</span></div>
+            <div class="summary-row"><span>Duration:</span><span id="summary-days">—</span></div>
+            <div class="summary-row discount-row" id="summary-discount-row" style="display:none;"><span>Discount:</span><span id="summary-discount" class="discount-val">—</span></div>
+            <div class="summary-row total-row"><span>Total Amount:</span><span id="summary-total" class="total-val">—</span></div>
+          </div>
+          <button type="submit" class="btn btn-primary full-width" id="rent-submit-btn">
+            <span class="btn-text">Confirm Rental</span>
+            <span class="btn-spinner" style="display:none;">⏳</span>
+          </button>
+        </form>
+        <div class="result-box" id="rent-result"></div>
+      </div>
+    </section>
+
+    <!-- ======================== UPLOAD SECTION ======================== -->
+    <section class="section" id="section-upload">
+      <div class="form-page">
+        <div class="form-header">
+          <h2 class="section-title">List a New Item</h2>
+          <p class="form-desc">Upload your clothing item to the marketplace.</p>
+        </div>
+        <form class="rental-form glass-form" id="upload-form" enctype="multipart/form-data" novalidate>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="item-name">Item Name *</label>
+              <input type="text" id="item-name" class="form-input" placeholder="e.g. Blue Banarasi Saree" required />
+            </div>
+            <div class="form-group full-width">
+              <label for="item-desc">Description</label>
+              <textarea id="item-desc" class="form-input form-textarea" placeholder="Describe the item, material, style..." rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="item-price">Rental Price / Day (₹) *</label>
+              <input type="number" id="item-price" class="form-input" placeholder="e.g. 500" min="1" required />
+            </div>
+            <div class="form-group">
+              <label for="item-cloth-type">Cloth Type ID *</label>
+              <select id="item-cloth-type" class="form-input" required>
+                <option value="">-- Select Type --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="item-size">Size</label>
+              <select id="item-size" class="form-input">
+                <option value="">-- Size --</option>
+                <option>XS</option><option>S</option><option>M</option>
+                <option>L</option><option>XL</option><option>XXL</option><option>Free Size</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="item-color">Color</label>
+              <input type="text" id="item-color" class="form-input" placeholder="e.g. Red, Gold" />
+            </div>
+            <div class="form-group">
+              <label for="item-brand">Brand</label>
+              <input type="text" id="item-brand" class="form-input" placeholder="e.g. Fabindia" />
+            </div>
+            <div class="form-group">
+              <label for="item-condition">Condition</label>
+              <select id="item-condition" class="form-input">
+                <option value="Excellent">Excellent</option>
+                <option value="Good" selected>Good</option>
+                <option value="Fair">Fair</option>
+              </select>
+            </div>
+            <div class="form-group full-width">
+              <label>Item Image</label>
+              <div class="file-drop-zone" id="file-drop-zone">
+                <div class="drop-content" id="drop-content">
+                  <div class="drop-icon">📸</div>
+                  <p>Drag & drop an image or <span class="drop-link">browse</span></p>
+                  <span class="drop-hint">JPG, PNG, WEBP – Max 10MB</span>
+                </div>
+                <img id="image-preview" class="image-preview" alt="Preview" style="display:none;" />
+                <input type="file" id="item-image" name="image" accept="image/*" style="display:none;" />
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary full-width" id="upload-submit-btn">
+            <span class="btn-text">Upload Item</span>
+            <span class="btn-spinner" style="display:none;">⏳</span>
+          </button>
+        </form>
+        <div class="result-box" id="upload-result"></div>
+      </div>
+    </section>
+
+    <!-- ======================== PAYMENT SECTION ======================== -->
+    <section class="section" id="section-payment">
+      <div class="form-page">
+        <div class="form-header">
+          <h2 class="section-title">Process Payment</h2>
+          <p class="form-desc">Record a payment for an existing rental.</p>
+        </div>
+        <form class="rental-form glass-form" id="payment-form" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="pay-rental-id">Rental ID *</label>
+              <input type="number" id="pay-rental-id" class="form-input" placeholder="Enter rental ID" required />
+            </div>
+            <div class="form-group">
+              <label for="pay-amount">Amount (₹) *</label>
+              <input type="number" id="pay-amount" class="form-input" placeholder="Enter amount" min="1" required />
+            </div>
+            <div class="form-group">
+              <label for="pay-method">Payment Method *</label>
+              <select id="pay-method" class="form-input" required>
+                <option value="">-- Select Method --</option>
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="upi">UPI</option>
+                <option value="online">Online Banking</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="pay-transaction">Transaction ID (Optional)</label>
+              <input type="text" id="pay-transaction" class="form-input" placeholder="e.g. TXN123456" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary full-width" id="payment-submit-btn">
+            <span class="btn-text">Record Payment</span>
+            <span class="btn-spinner" style="display:none;">⏳</span>
+          </button>
+        </form>
+        <div class="result-box" id="payment-result"></div>
+
+        <!-- Recent Payments -->
+        <div class="section-header" style="margin-top:2rem;">
+          <h3 class="section-title" style="font-size:1.2rem;">Recent Payments</h3>
+          <button class="btn btn-sm btn-outline" id="refresh-payments-btn">Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="payments-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Rental ID</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="payments-tbody">
+              <tr><td colspan="6" class="empty-row">Loading payments...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ITEM DETAIL MODAL -->
+  <div class="modal-overlay" id="modal-overlay" style="display:none;">
+    <div class="modal" id="item-modal">
+      <button class="modal-close" id="modal-close-btn">✕</button>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  phone     String?
+  address   String?
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  rentals   Rental[]
+  reviews   Review[]
+  searches  Search[]
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  clothTypes  ClothType[]
+}
+
+model ClothType {
+  id          Int            @id @default(autoincrement())
+  name        String
+  description String?
+  categoryId  Int
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  category    Category       @relation(fields: [categoryId], references: [id])
+  items       ClothingItem[]
+}
+
+model ClothingItem {
+  id             Int       @id @default(autoincrement())
+  name           String
+  description    String?
+  imageUrl       String?
+  rentalPrice    Float
+  size           String?
+  color          String?
+  brand          String?
+  condition      String    @default("Good")
+  isAvailable    Boolean   @default(true)
+  clothTypeId    Int
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  clothType      ClothType  @relation(fields: [clothTypeId], references: [id])
+  rentals        Rental[]
+  reviews        Review[]
+  returnItems    ReturnItem[]
+}
+
+model Rental {
+  id            Int          @id @default(autoincrement())
+  userId        Int
+  itemId        Int
+  startDate     DateTime
+  endDate       DateTime
+  totalAmount   Float
+  status        String       @default("active") // active, returned, cancelled
+  couponId      Int?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  user          User         @relation(fields: [userId], references: [id])
+  item          ClothingItem @relation(fields: [itemId], references: [id])
+  coupon        Coupon?      @relation(fields: [couponId], references: [id])
+  payment       Payment?
+  returnItem    ReturnItem?
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  rentalId      Int      @unique
+  amount        Float
+  method        String   // cash, card, upi, online
+  status        String   @default("pending") // pending, completed, failed, refunded
+  transactionId String?
+  paidAt        DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  rental        Rental   @relation(fields: [rentalId], references: [id])
+}
+
+model ReturnItem {
+  id          Int          @id @default(autoincrement())
+  rentalId    Int          @unique
+  itemId      Int
+  returnDate  DateTime
+  condition   String       @default("Good") // Good, Damaged, Lost
+  lateFee     Float        @default(0)
+  remarks     String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  rental      Rental       @relation(fields: [rentalId], references: [id])
+  item        ClothingItem @relation(fields: [itemId], references: [id])
+}
+
+model Review {
+  id        Int          @id @default(autoincrement())
+  userId    Int
+  itemId    Int
+  rating    Int          // 1-5
+  comment   String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user      User         @relation(fields: [userId], references: [id])
+  item      ClothingItem @relation(fields: [itemId], references: [id])
+}
+
+model Search {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  query     String
+  results   Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Coupon {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  discount    Float    // percentage or flat amount
+  type        String   @default("percentage") // percentage, flat
+  minAmount   Float    @default(0)
+  maxUses     Int      @default(100)
+  usedCount   Int      @default(0)
+  isActive    Boolean  @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rentals     Rental[]
+}
