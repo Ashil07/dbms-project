@@ -1,0 +1,161 @@
+.loginContainer {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--bg);
+}
+
+.loginVisual {
+  background: linear-gradient(135deg, #1a1a1a 0%, #3d2b1f 60%, #2c2c2c 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 3rem;
+}
+
+.loginVisualText {
+  color: #fff;
+}
+
+.loginVisualTitle {
+  font-size: 2.5rem;
+  font-weight: 300;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.loginVisualSub {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.6;
+}
+
+.loginFormSide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 380px;
+}
+
+.loginHeader {
+  margin-bottom: 2.5rem;
+}
+
+.loginEye {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.loginTitle {
+  font-size: 1.75rem;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.formLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.formInput {
+  padding: 0.7rem 0.85rem;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-size: 0.88rem;
+  transition: border-color var(--transition);
+  outline: none;
+}
+
+.formInput:focus {
+  border-color: var(--text);
+}
+
+.formInput::placeholder {
+  color: var(--text-faint);
+}
+
+.loginButton {
+  padding: 0.8rem 1.5rem;
+  background: var(--text);
+  color: var(--bg);
+  border: 1px solid var(--text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity var(--transition);
+  margin-top: 0.5rem;
+}
+
+.loginButton:hover:not(:disabled) {
+  opacity: 0.75;
+}
+
+.loginButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.loginFooter {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.footerText {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+}
+
+@media (max-width: 700px) {
+  .loginContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .loginVisual {
+    display: none;
+  }
+
+  .loginFormSide {
+    padding: 4rem 1.5rem 2rem;
+    align-items: flex-start;
+  }
+}

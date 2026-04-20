@@ -1,0 +1,336 @@
+.page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+}
+
+/* ── Page Header ── */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.pageEye {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.browseBtn {
+  padding: 0.55rem 1.25rem;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--text);
+  cursor: pointer;
+  transition: opacity var(--transition);
+  white-space: nowrap;
+}
+
+.browseBtn:hover {
+  opacity: 0.75;
+}
+
+/* ── Stats Row ── */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.statCard {
+  padding: 1.75rem 1.5rem;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.statCard:last-child {
+  border-right: none;
+}
+
+.statValue {
+  font-size: 2.25rem;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 0.35rem;
+}
+
+.statSub {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ── Action Grid ── */
+.actionGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 260px;
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.actionCard {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+.actionCard:last-child {
+  border-right: none;
+}
+
+.actionCardBg {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.4s ease;
+}
+
+.actionCard:hover .actionCardBg {
+  transform: scale(1.04);
+}
+
+.actionCardContent {
+  position: relative;
+  z-index: 1;
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.actionEye {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 0.4rem;
+}
+
+.actionTitle {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.01em;
+}
+
+.actionDesc {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.actionArrow {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.5);
+  transition: transform var(--transition);
+}
+
+.actionCard:hover .actionArrow {
+  transform: translateX(4px);
+}
+
+/* ── Table Section ── */
+.tableSection {
+  border: 1px solid var(--border);
+}
+
+.tableSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tableSectionTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.tableViewAll {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.tableViewAll:hover {
+  color: var(--text);
+}
+
+.tableLoading,
+.tableEmpty {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.inlineLink {
+  background: none;
+  border: none;
+  color: var(--text);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-2);
+}
+
+.table td {
+  padding: 0.9rem 1.5rem;
+  font-size: 0.82rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: var(--surface);
+}
+
+.dateTd {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.statusActive {
+  background: rgba(45, 122, 79, 0.12);
+  color: #2d7a4f;
+}
+
+.statusReturned {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-muted);
+}
+
+.statusCancelled {
+  background: rgba(192, 57, 43, 0.1);
+  color: #c0392b;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1000px) {
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statCard:nth-child(2) {
+    border-right: none;
+  }
+
+  .statCard:nth-child(1),
+  .statCard:nth-child(2) {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .actionGrid {
+    grid-template-columns: repeat(2, 1fr);
+    height: auto;
+  }
+
+  .actionCard {
+    height: 200px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .actionCard:nth-child(2),
+  .actionCard:nth-child(4) {
+    border-right: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .statsRow {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .actionGrid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .actionCard {
+    border-right: none;
+  }
+
+  .table th:nth-child(2),
+  .table td:nth-child(2) {
+    display: none;
+  }
+}
