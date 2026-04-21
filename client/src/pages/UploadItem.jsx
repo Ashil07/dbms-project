@@ -11,7 +11,7 @@ export default function UploadItem() {
 
   const [form, setForm] = useState({
     name: '', description: '', rentalPrice: '', clothTypeId: '',
-    size: '', color: '', brand: '', condition: 'Good',
+    size: '', color: '', brand: '', condition: 'Good', quantity: 1,
   })
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
@@ -58,8 +58,8 @@ export default function UploadItem() {
 
   const handleSubmit = async e => {
     e.preventDefault()
-    if (!form.name || !form.rentalPrice || !form.clothTypeId)
-      return toast.error('Name, price, and cloth type are required')
+    if (!form.name || !form.rentalPrice || !form.clothTypeId || !form.quantity)
+      return toast.error('Name, price, quantity, and cloth type are required')
     setSubmitting(true)
     try {
       const fd = new FormData()
@@ -69,7 +69,7 @@ export default function UploadItem() {
       const r = await createItem(fd)
       setResult(r.data.data)
       toast.success('Item listed successfully!')
-      setForm({ name: '', description: '', rentalPrice: '', clothTypeId: '', size: '', color: '', brand: '', condition: 'Good' })
+      setForm({ name: '', description: '', rentalPrice: '', clothTypeId: '', size: '', color: '', brand: '', condition: 'Good', quantity: 1 })
       setSelectedCategoryId('')
       setImageFile(null)
       setImagePreview(null)
@@ -166,6 +166,12 @@ export default function UploadItem() {
             <div className={styles.group}>
               <label className={styles.label}>Rental Price / Day (₹) *</label>
               <input type="number" className={styles.input} placeholder="e.g. 1500" min="1" value={form.rentalPrice} onChange={set('rentalPrice')} required />
+            </div>
+
+            {/* Quantity */}
+            <div className={styles.group}>
+              <label className={styles.label}>Quantity Available *</label>
+              <input type="number" className={styles.input} placeholder="e.g. 5" min="1" value={form.quantity} onChange={set('quantity')} required />
             </div>
 
             {/* Size */}

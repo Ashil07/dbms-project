@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { getItems, createRental, validateCoupon } from '../api/axios'
+import { getItems, createRental, validateCoupon, getRentals } from '../api/axios'
 import styles from './FormPage.module.css'
 
 export default function RentPage() {
@@ -17,6 +17,7 @@ export default function RentPage() {
         endDate: '',
         couponCode: '',
     })
+    const [itemRentals, setItemRentals] = useState([])
     const [couponData, setCouponData] = useState(null)
     const [submitting, setSubmitting] = useState(false)
     const [result, setResult] = useState(null)
@@ -26,6 +27,19 @@ export default function RentPage() {
             .then((r) => setItems(r.data.data || []))
             .catch(() => { })
     }, [])
+
+    // Fetch rentals for selected item to check availability
+    useEffect(() => {
+        if (selectedItem) {
+            getRentals()
+                .then((r) => {
+                    const rentals = r.data.data || []
+                    const itemRentals = rentals.filter(rental => rental.itemId === selectedItem.id && rental.status === 'active')
+                    setItemRentals(itemRentals)
+                })
+                .catch(() => { })
+        }
+    }, [selectedItem])
 
     const selectedItem = items.find((i) => i.id === parseInt(form.itemId)) || prefill
 
@@ -41,6 +55,19 @@ export default function RentPage() {
             : couponData.discount
         : 0
     const total = Math.max(0, baseTotal - discount)
+
+    // Calculate availability
+    const availableQuantity = selectedItem ? selectedItem.quantity - itemRentals.length : 0
+    const isAvailable = availableQuantity > 0
+    
+    // Calculate next available date (when all items are returned + 2 days buffer)
+    const nextAvailableDate = selectedItem && itemRentals.length > 0
+        ? itemRentals.reduce((latestDate, rental) => {
+            const returnDate = new Date(rental.endDate)
+            const availableDate = new Date(returnDate.getTime() + (2 * 24 * 60 * 60 * 1000)) // +2 days
+            return availableDate > latestDate ? availableDate : latestDate
+        }, new Date())
+        : null
 
     const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
 
@@ -61,6 +88,13 @@ export default function RentPage() {
         if (!form.userId || !form.itemId || !form.startDate || !form.endDate)
             return toast.error('Please fill all required fields')
         if (days <= 0) return toast.error('End date must be after start date')
+        if (selectedItem && !isAvailable) {
+            if (nextAvailableDate) {
+                return toast.error(`This item is currently all rented. Next available on ${nextAvailableDate.toLocaleDateString()}`)
+            } else {
+                return toast.error('This item is currently not available for rent')
+            }
+        }
         setSubmitting(true)
         try {
             const r = await createRental({
@@ -98,11 +132,18 @@ export default function RentPage() {
                             <label className={styles.label}>Select Item *</label>
                             <select className={styles.input} value={form.itemId} onChange={set('itemId')} required>
                                 <option value="">-- Choose an item --</option>
-                                {items.map((i) => (
-                                    <option key={i.id} value={i.id}>
-                                        {i.name} — ₹{i.rentalPrice}/day
-                                    </option>
-                                ))}
+                                {items.map((i) => {
+                                    const itemRentalsCount = itemRentals.filter(r => r.itemId === i.id).length
+                                    const availableQty = i.quantity - itemRentalsCount
+                                    const isItemAvailable = availableQty > 0
+                                    
+                                    return (
+                                        <option key={i.id} value={i.id} disabled={!isItemAvailable}>
+                                            {i.name} — ₹{i.rentalPrice}/day 
+                                            {isItemAvailable ? ` (${availableQty} available)` : ' (All rented)'}
+                                        </option>
+                                    )
+                                })}
                             </select>
                         </div>
                         <div className={styles.group}>
@@ -123,18 +164,30 @@ export default function RentPage() {
                         </div>
                     </div>
 
-                    {selectedItem && days > 0 && (
+                    {selectedItem && (
                         <div className={styles.summary}>
                             <div className={styles.sumRow}><span>Price / Day</span><span>₹{selectedItem.rentalPrice}</span></div>
-                            <div className={styles.sumRow}><span>Duration</span><span>{days} day{days > 1 ? 's' : ''}</span></div>
-                            <div className={styles.sumRow}><span>Subtotal</span><span>₹{baseTotal.toFixed(2)}</span></div>
-                            {discount > 0 && <div className={styles.sumRow}><span>Discount</span><span className={styles.discount}>-₹{discount.toFixed(2)}</span></div>}
-                            <div className={`${styles.sumRow} ${styles.sumTotal}`}><span>Total</span><span className={styles.totalVal}>₹{total.toFixed(2)}</span></div>
+                            <div className={styles.sumRow}><span>Available Quantity</span><span>{availableQuantity}</span></div>
+                            {nextAvailableDate && (
+                                <div className={styles.sumRow}><span>Next Available</span><span>{nextAvailableDate.toLocaleDateString()}</span></div>
+                            )}
+                            {days > 0 && (
+                                <div className={styles.sumRow}><span>Duration</span><span>{days} day{days > 1 ? 's' : ''}</span></div>
+                            )}
+                            {days > 0 && (
+                                <div className={styles.sumRow}><span>Subtotal</span><span>₹{baseTotal.toFixed(2)}</span></div>
+                            )}
+                            {discount > 0 && (
+                                <div className={styles.sumRow}><span>Discount</span><span className={styles.discount}>-₹{discount.toFixed(2)}</span></div>
+                            )}
+                            {days > 0 && (
+                                <div className={`${styles.sumRow} ${styles.sumTotal}`}><span>Total</span><span className={styles.totalVal}>₹{total.toFixed(2)}</span></div>
+                            )}
                         </div>
                     )}
 
-                    <button type="submit" className={`${styles.btn} ${styles.btnPrimary} ${styles.fullWidth}`} disabled={submitting}>
-                        {submitting ? '⏳ Creating Rental...' : 'Confirm Rental'}
+                    <button type="submit" className={`${styles.btn} ${styles.btnPrimary} ${styles.fullWidth}`} disabled={submitting || !isAvailable}>
+                        {submitting ? '⏳ Creating Rental...' : isAvailable ? 'Confirm Rental' : 'Item Not Available'}
                     </button>
                 </form>
 
