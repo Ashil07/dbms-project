@@ -1,15 +1,30 @@
 import { Link } from 'react-router-dom'
 import styles from './LandingPage.module.css'
+import accessoriesImg from '../assets/accessories.jpg'
+import basicsImg from '../assets/basics.jpg'
+import cordImg from '../assets/cord.jpg'
+import fallImg from '../assets/fall.jpg'
+import itGirlImg from '../assets/IT girl.jpg'
+import jacketsImg from '../assets/jackets.jpg'
+import premiumOutfitImg from '../assets/premium outfit.jpg'
+import suiteWomenImg from '../assets/suite women.jpg'
+import traditionalWearImg from '../assets/traditional wear.jpg'
 
 const categories = [
-  { label: 'Most Wanted', sub: 'The pieces everyone is reaching for', img: null, span: 'wide' },
-  { label: 'Accessories', sub: 'From fine jewellery to statement bags', img: null, span: 'normal' },
-  { label: 'Get Cozy', sub: 'Knitwear, loungewear & soft layers', img: null, span: 'normal' },
-  { label: 'Basics', sub: 'The foundation of every great outfit', img: null, span: 'normal' },
-  { label: 'It Girl', sub: 'Curated for the effortlessly cool', img: null, span: 'normal' },
-  { label: 'Men', sub: 'Sharp, relaxed, and everything between', img: null, span: 'normal' },
-  { label: 'Jackets', sub: 'Layer up in style', img: null, span: 'normal' },
+  { label: 'Most Wanted', sub: 'The pieces everyone is reaching for', img: premiumOutfitImg, span: 'wide' },
+  { label: 'Accessories', sub: 'From fine jewellery to statement bags', img: accessoriesImg, span: 'normal' },
+  { label: 'Get Cozy', sub: 'Knitwear, loungewear & soft layers', img: cordImg, span: 'normal' },
+  { label: 'New In', sub: 'Just landed this week', img: suiteWomenImg, span: 'normal' },
+  { label: 'Basics', sub: 'The foundation of every great outfit', img: basicsImg, span: 'normal' },
+  { label: 'It Girl', sub: 'Curated for the effortlessly cool', img: itGirlImg, span: 'normal' },
+  { label: 'Men', sub: 'Sharp, relaxed, and everything between', img: fallImg, span: 'normal' },
+  { label: 'Jackets', sub: 'Layer up in style', img: jacketsImg, span: 'normal' },
 ]
+
+const heroImages = {
+  left: traditionalWearImg,
+  right: null,
+}
 
 const editorial = [
   { label: 'Fall Must-Haves', tag: 'New Arrivals' },
@@ -24,7 +39,14 @@ export default function LandingPage() {
       {/* Hero — full bleed split */}
       <section className={styles.hero}>
         <div className={styles.heroLeft}>
-          <div className={styles.heroImgPlaceholder} style={{ background: '#c9b8a8' }} />
+          <div
+            className={styles.heroImgPlaceholder}
+            style={{
+              backgroundImage: `url(${heroImages.left})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
         </div>
         <div className={styles.heroCenter}>
           <p className={styles.heroEyebrow}>ThreadRent</p>
@@ -39,62 +61,42 @@ export default function LandingPage() {
 
       {/* Category grid row 1 */}
       <section className={styles.catGrid1}>
-        <div className={`${styles.catCell} ${styles.catWide}`}>
-          <div className={styles.catBg} style={{ background: '#8b7355' }} />
-          <div className={styles.catLabel}>
-            <span className={styles.catName}>Most Wanted</span>
-            <span className={styles.catSub}>The pieces everyone is reaching for</span>
+        {categories.slice(0, 4).map(category => (
+          <div key={category.label} className={`${styles.catCell} ${category.span === 'wide' ? styles.catWide : ''}`}>
+            <div
+              className={styles.catBg}
+              style={{
+                backgroundImage: `url(${category.img})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
+            <div className={styles.catLabel}>
+              <span className={styles.catName}>{category.label}</span>
+              {category.sub && <span className={styles.catSub}>{category.sub}</span>}
+            </div>
           </div>
-        </div>
-        <div className={styles.catCell}>
-          <div className={styles.catBg} style={{ background: '#6b5a3e' }} />
-          <div className={styles.catLabel}>
-            <span className={styles.catName}>Accessories</span>
-            <span className={styles.catSub}>From fine jewellery to statement bags</span>
-          </div>
-        </div>
-        <div className={styles.catCell}>
-          <div className={styles.catBg} style={{ background: '#9e9e9e' }} />
-          <div className={styles.catLabel}>
-            <span className={styles.catName}>Get Cozy</span>
-            <span className={styles.catSub}>Knitwear, loungewear & soft layers</span>
-          </div>
-        </div>
-        <div className={styles.catCell}>
-          <div className={styles.catBg} style={{ background: '#2c2c2c' }} />
-          <div className={styles.catLabel}>
-            <span className={styles.catName}>New In</span>
-            <span className={styles.catSub}>Just landed this week</span>
-          </div>
-        </div>
+        ))}
       </section>
 
       {/* Category grid row 2 */}
       <section className={styles.catGrid2}>
-        <div className={styles.catCell}>
-          <div className={styles.catBg} style={{ background: '#d4c5b0' }} />
-          <div className={styles.catLabel}>
-            <span className={styles.catName}>Basics</span>
+        {categories.slice(4).map(category => (
+          <div key={category.label} className={styles.catCell}>
+            <div
+              className={styles.catBg}
+              style={{
+                backgroundImage: `url(${category.img})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
+            <div className={styles.catLabel}>
+              <span className={styles.catName}>{category.label}</span>
+              {category.sub && <span className={styles.catSub}>{category.sub}</span>}
+            </div>
           </div>
-        </div>
-        <div className={styles.catCell}>
-          <div className={styles.catBg} style={{ background: '#7a6a5a' }} />
-          <div className={styles.catLabel}>
-            <span className={styles.catName}>It Girl</span>
-          </div>
-        </div>
-        <div className={styles.catCell}>
-          <div className={styles.catBg} style={{ background: '#4a4a4a' }} />
-          <div className={styles.catLabel}>
-            <span className={styles.catName}>Men</span>
-          </div>
-        </div>
-        <div className={styles.catCell}>
-          <div className={styles.catBg} style={{ background: '#1a1a1a' }} />
-          <div className={styles.catLabel}>
-            <span className={styles.catName}>Jackets</span>
-          </div>
-        </div>
+        ))}
       </section>
 
       {/* Editorial section */}
