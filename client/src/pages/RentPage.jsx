@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { getItems, createRental, validateCoupon, getRentals } from '../api/axios'
+import { getItems, createRental, validateCoupon, getRentals, getUsers } from '../api/axios'
 import { useAuth } from '../contexts/AuthContext'
 import styles from './FormPage.module.css'
 
@@ -10,34 +10,55 @@ export default function RentPage() {
     const nav = useNavigate()
     const { isLoggedIn } = useAuth()
     const prefill = location.state?.item
+    const [resolvedUserId, setResolvedUserId] = useState(null)
+    const [resolvingUser, setResolvingUser] = useState(true)
 
-    // Check if user is logged in
-    if (!isLoggedIn) {
-        nav('/login')
-        toast.error('Please log in to rent items')
-        return null
-    }
-    
-    // Generate user ID if not available
-    const generateUserId = (email) => {
-        if (!email) return 'USR000000'
-        const hash = email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-        return `USR${String(hash).padStart(6, '0').slice(-6)}`
-    }
+    useEffect(() => {
+        if (!isLoggedIn) {
+            toast.error('Please log in to rent items')
+            nav('/login')
+            return
+        }
 
-    const userEmail = localStorage.getItem('userEmail') || 'guest@example.com'
-    const savedUserId = localStorage.getItem('userId')
-    const userId = savedUserId || generateUserId(userEmail)
-    
-    console.log('User ID Debug:')
-    console.log('Saved userId:', savedUserId)
-    console.log('Generated userId:', generateUserId(userEmail))
-    console.log('Final userId:', userId)
+        const resolveUser = async () => {
+            setResolvingUser(true)
+            try {
+                const savedUserId = localStorage.getItem('userId')
+                const parsedSavedId = Number.parseInt(savedUserId || '', 10)
+                if (Number.isInteger(parsedSavedId) && parsedSavedId > 0) {
+                    setResolvedUserId(parsedSavedId)
+                    return
+                }
+
+                const userEmail = localStorage.getItem('userEmail')
+                if (!userEmail) {
+                    setResolvedUserId(null)
+                    return
+                }
+
+                const usersResponse = await getUsers()
+                const users = usersResponse.data?.data || []
+                const matchedUser = users.find((u) => u.email?.toLowerCase() === userEmail.toLowerCase())
+
+                if (matchedUser?.id) {
+                    setResolvedUserId(matchedUser.id)
+                    localStorage.setItem('userId', String(matchedUser.id))
+                } else {
+                    setResolvedUserId(null)
+                }
+            } catch {
+                setResolvedUserId(null)
+            } finally {
+                setResolvingUser(false)
+            }
+        }
+
+        resolveUser()
+    }, [isLoggedIn, nav])
 
     const [items, setItems] = useState([])
     const [allRentals, setAllRentals] = useState([])
     const [form, setForm] = useState({
-        userId: userId,
         itemId: prefill?.id || '',
         startDate: '',
         endDate: '',
@@ -55,13 +76,10 @@ export default function RentPage() {
         ])
             .then(([itemsRes, rentalsRes]) => {
                 const items = itemsRes.data.data || []
-                console.log('Items from API:', items)
-                console.log('Rentals from API:', rentalsRes.data.data || [])
                 setItems(items)
                 setAllRentals(rentalsRes.data.data || [])
             })
             .catch((error) => {
-                console.error('Error fetching data:', error)
                 toast.error('Failed to load data')
             })
     }, [])
@@ -91,16 +109,6 @@ export default function RentPage() {
     const availableQuantity = selectedItem ? itemQuantity - selectedItemRentals.length : 0
     const isAvailable = availableQuantity > 0
     
-    // Debug: log to check values
-    console.log('=== AVAILABILITY DEBUG ===')
-    console.log('Selected Item:', selectedItem)
-    console.log('All Rentals:', allRentals)
-    console.log('Item Rentals:', selectedItemRentals)
-    console.log('Item Quantity:', itemQuantity)
-    console.log('Available Quantity:', availableQuantity)
-    console.log('Is Available:', isAvailable)
-    console.log('========================')
-    
     // Calculate next available date (when all items are returned + 2 days buffer)
     const nextAvailableDate = selectedItem && selectedItemRentals.length > 0
         ? selectedItemRentals.reduce((latestDate, rental) => {
@@ -126,7 +134,8 @@ export default function RentPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!form.userId || !form.itemId || !form.startDate || !form.endDate)
+        if (!resolvedUserId) return toast.error('Unable to identify your account. Please sign in again.')
+        if (!form.itemId || !form.startDate || !form.endDate)
             return toast.error('Please fill all required fields')
         if (days <= 0) return toast.error('End date must be after start date')
         if (selectedItem && !isAvailable) {
@@ -139,7 +148,7 @@ export default function RentPage() {
         setSubmitting(true)
         try {
             const r = await createRental({
-                userId: parseInt(userId), // userId is now already numeric
+                userId: resolvedUserId,
                 itemId: parseInt(form.itemId),
                 startDate: form.startDate,
                 endDate: form.endDate,
@@ -147,7 +156,7 @@ export default function RentPage() {
             })
             setResult(r.data.data)
             toast.success('Rental created successfully!')
-            setForm({ userId: userId, itemId: '', startDate: '', endDate: '', couponCode: '' })
+            setForm({ itemId: '', startDate: '', endDate: '', couponCode: '' })
             setCouponData(null)
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to create rental')
@@ -167,8 +176,17 @@ export default function RentPage() {
                     <div className={styles.grid}>
                         <div className={styles.group}>
                             <label className={styles.label}>User ID</label>
-                            <input type="text" className={styles.input} placeholder="Your user ID" value={userId} readOnly style={{ background: 'var(--bg-secondary)', cursor: 'not-allowed' }} />
-                            <small style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Auto-filled from your profile</small>
+                            <input
+                                type="text"
+                                className={styles.input}
+                                placeholder="Your user ID"
+                                value={resolvingUser ? 'Loading...' : (resolvedUserId || 'Not linked')}
+                                readOnly
+                                style={{ background: 'var(--bg-secondary)', cursor: 'not-allowed' }}
+                            />
+                            <small style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                                {resolvingUser ? 'Fetching your profile...' : resolvedUserId ? 'Auto-filled from your profile' : 'User not found. Please sign in again.'}
+                            </small>
                         </div>
                         <div className={styles.group}>
                             <label className={styles.label}>Select Item *</label>
@@ -229,7 +247,7 @@ export default function RentPage() {
                         </div>
                     )}
 
-                    <button type="submit" className={`${styles.btn} ${styles.btnPrimary} ${styles.fullWidth}`} disabled={submitting || !isAvailable}>
+                    <button type="submit" className={`${styles.btn} ${styles.btnPrimary} ${styles.fullWidth}`} disabled={submitting || !isAvailable || resolvingUser || !resolvedUserId}>
                         {submitting ? '⏳ Creating Rental...' : isAvailable ? 'Confirm Rental' : 'Item Not Available'}
                     </button>
                 </form>

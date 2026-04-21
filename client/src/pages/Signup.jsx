@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
+import { createUser } from '../api/axios'
 import styles from './Signup.module.css'
 
 export default function Signup() {
@@ -36,10 +37,16 @@ export default function Signup() {
         return
       }
 
-      // Mock signup - replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
       if (formData.name && formData.email && formData.password) {
+        const response = await createUser({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          password: formData.password,
+        })
+        const createdUser = response.data?.data
+        if (createdUser?.id) localStorage.setItem('userId', String(createdUser.id))
+        localStorage.setItem('userEmail', formData.email.trim())
+        localStorage.setItem('userName', formData.name.trim())
         login()
         toast.success('Welcome to ThreadRent!')
         navigate('/dashboard')
