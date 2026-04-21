@@ -26,9 +26,18 @@ export default function Login() {
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       if (formData.email && formData.password && formData.phone) {
+        // Generate a simple numeric user ID based on email hash
+        const generateUserId = (email) => {
+          const hash = email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+          return (hash % 100000) + 1 // Keep it within reasonable range
+        }
+        
+        const userId = generateUserId(formData.email)
+        
         login()
         localStorage.setItem('userEmail', formData.email)
         localStorage.setItem('userPhone', formData.phone)
+        localStorage.setItem('userId', userId.toString())
         toast.success('Welcome back!')
         navigate('/dashboard')
       } else {

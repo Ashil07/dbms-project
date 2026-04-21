@@ -22,7 +22,8 @@ export default function Profile() {
 
   const userEmail = localStorage.getItem('userEmail') || 'user@example.com'
   const userPhone = localStorage.getItem('userPhone') || '+91 98765 43210'
-  const userId = generateUserId(userEmail)
+  const savedUserId = localStorage.getItem('userId')
+  const userId = savedUserId || generateUserId(userEmail)
   const userName = localStorage.getItem('userName') || 'User Profile'
 
   const onSignOut = () => {

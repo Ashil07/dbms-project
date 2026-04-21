@@ -8,7 +8,15 @@ import styles from './FormPage.module.css'
 export default function RentPage() {
     const location = useLocation()
     const nav = useNavigate()
+    const { isLoggedIn } = useAuth()
     const prefill = location.state?.item
+
+    // Check if user is logged in
+    if (!isLoggedIn) {
+        nav('/login')
+        toast.error('Please log in to rent items')
+        return null
+    }
     
     // Generate user ID if not available
     const generateUserId = (email) => {
@@ -18,9 +26,16 @@ export default function RentPage() {
     }
 
     const userEmail = localStorage.getItem('userEmail') || 'guest@example.com'
-    const userId = generateUserId(userEmail)
+    const savedUserId = localStorage.getItem('userId')
+    const userId = savedUserId || generateUserId(userEmail)
+    
+    console.log('User ID Debug:')
+    console.log('Saved userId:', savedUserId)
+    console.log('Generated userId:', generateUserId(userEmail))
+    console.log('Final userId:', userId)
 
     const [items, setItems] = useState([])
+    const [allRentals, setAllRentals] = useState([])
     const [form, setForm] = useState({
         userId: userId,
         itemId: prefill?.id || '',
@@ -28,31 +43,35 @@ export default function RentPage() {
         endDate: '',
         couponCode: '',
     })
-    const [itemRentals, setItemRentals] = useState([])
     const [couponData, setCouponData] = useState(null)
     const [submitting, setSubmitting] = useState(false)
     const [result, setResult] = useState(null)
 
     useEffect(() => {
-        getItems({ available: 'true', limit: 100 })
-            .then((r) => setItems(r.data.data || []))
-            .catch(() => { })
+        // Fetch both items and rentals
+        Promise.all([
+            getItems({ limit: 100 }), // Remove available filter to get all items
+            getRentals()
+        ])
+            .then(([itemsRes, rentalsRes]) => {
+                const items = itemsRes.data.data || []
+                console.log('Items from API:', items)
+                console.log('Rentals from API:', rentalsRes.data.data || [])
+                setItems(items)
+                setAllRentals(rentalsRes.data.data || [])
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error)
+                toast.error('Failed to load data')
+            })
     }, [])
 
     const selectedItem = items.find((i) => i.id === parseInt(form.itemId)) || prefill
 
-    // Fetch rentals for selected item to check availability
-    useEffect(() => {
-        if (selectedItem) {
-            getRentals()
-                .then((r) => {
-                    const rentals = r.data.data || []
-                    const itemRentals = rentals.filter(rental => rental.itemId === selectedItem.id && rental.status === 'active')
-                    setItemRentals(itemRentals)
-                })
-                .catch(() => { })
-        }
-    }, [selectedItem])
+    // Calculate rentals for selected item
+    const selectedItemRentals = selectedItem 
+        ? allRentals.filter(rental => rental.itemId === selectedItem.id && rental.status === 'active')
+        : []
 
     const days =
         form.startDate && form.endDate
@@ -68,12 +87,23 @@ export default function RentPage() {
     const total = Math.max(0, baseTotal - discount)
 
     // Calculate availability
-    const availableQuantity = selectedItem ? selectedItem.quantity - itemRentals.length : 0
+    const itemQuantity = selectedItem?.quantity || 1 // Default to 1 if quantity not set
+    const availableQuantity = selectedItem ? itemQuantity - selectedItemRentals.length : 0
     const isAvailable = availableQuantity > 0
     
+    // Debug: log to check values
+    console.log('=== AVAILABILITY DEBUG ===')
+    console.log('Selected Item:', selectedItem)
+    console.log('All Rentals:', allRentals)
+    console.log('Item Rentals:', selectedItemRentals)
+    console.log('Item Quantity:', itemQuantity)
+    console.log('Available Quantity:', availableQuantity)
+    console.log('Is Available:', isAvailable)
+    console.log('========================')
+    
     // Calculate next available date (when all items are returned + 2 days buffer)
-    const nextAvailableDate = selectedItem && itemRentals.length > 0
-        ? itemRentals.reduce((latestDate, rental) => {
+    const nextAvailableDate = selectedItem && selectedItemRentals.length > 0
+        ? selectedItemRentals.reduce((latestDate, rental) => {
             const returnDate = new Date(rental.endDate)
             const availableDate = new Date(returnDate.getTime() + (2 * 24 * 60 * 60 * 1000)) // +2 days
             return availableDate > latestDate ? availableDate : latestDate
@@ -109,7 +139,7 @@ export default function RentPage() {
         setSubmitting(true)
         try {
             const r = await createRental({
-                userId: userId,
+                userId: parseInt(userId), // userId is now already numeric
                 itemId: parseInt(form.itemId),
                 startDate: form.startDate,
                 endDate: form.endDate,
@@ -145,8 +175,9 @@ export default function RentPage() {
                             <select className={styles.input} value={form.itemId} onChange={set('itemId')} required>
                                 <option value="">-- Choose an item --</option>
                                 {items.map((i) => {
-                                    const itemRentalsCount = itemRentals.filter(r => r.itemId === i.id).length
-                                    const availableQty = i.quantity - itemRentalsCount
+                                    const itemRentalsCount = allRentals.filter(r => r.itemId === i.id && r.status === 'active').length
+                                    const itemQty = i.quantity || 1 // Default to 1 if quantity not set
+                                    const availableQty = itemQty - itemRentalsCount
                                     const isItemAvailable = availableQty > 0
                                     
                                     return (
