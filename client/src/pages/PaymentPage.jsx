@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { createPayment, getPayments } from '../api/axios'
+import { createPayment, getPayments, getRentals } from '../api/axios'
 import styles from './FormPage.module.css'
 
 const statusClass = {
@@ -14,6 +14,7 @@ const statusClass = {
 export default function PaymentPage() {
     const location = useLocation()
     const prefill = location.state || {}
+    const loggedInEmail = localStorage.getItem('userEmail')
 
     const [form, setForm] = useState({
         rentalId: prefill.rentalId || '',
@@ -22,7 +23,9 @@ export default function PaymentPage() {
         transactionId: '',
     })
     const [payments, setPayments] = useState([])
+    const [pendingRentals, setPendingRentals] = useState([])
     const [loadingPayments, setLoadingPayments] = useState(true)
+    const [loadingPending, setLoadingPending] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [result, setResult] = useState(null)
 
@@ -34,9 +37,48 @@ export default function PaymentPage() {
             .finally(() => setLoadingPayments(false))
     }
 
-    useEffect(() => { fetchPayments() }, [])
+    const fetchPendingRentals = () => {
+        setLoadingPending(true)
+        getRentals()
+            .then((r) => {
+                const rentals = r.data.data || []
+                const mine = loggedInEmail
+                    ? rentals.filter((rental) => rental.user?.email?.toLowerCase() === loggedInEmail.toLowerCase())
+                    : rentals
+                const pending = mine.filter((rental) => !rental.payment)
+                setPendingRentals(pending)
 
-    const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+                if (prefill.rentalId) {
+                    const selected = pending.find((rental) => rental.id === parseInt(prefill.rentalId))
+                    if (selected) {
+                        setForm((f) => ({
+                            ...f,
+                            rentalId: String(selected.id),
+                            amount: selected.totalAmount,
+                        }))
+                    }
+                }
+            })
+            .catch(() => { })
+            .finally(() => setLoadingPending(false))
+    }
+
+    useEffect(() => { fetchPayments() }, [])
+    useEffect(() => { fetchPendingRentals() }, [])
+
+    const set = (k) => (e) => {
+        const value = e.target.value
+        if (k === 'rentalId') {
+            const rental = pendingRentals.find((r) => r.id === parseInt(value))
+            setForm((f) => ({
+                ...f,
+                rentalId: value,
+                amount: rental ? rental.totalAmount : '',
+            }))
+            return
+        }
+        setForm((f) => ({ ...f, [k]: value }))
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -54,6 +96,7 @@ export default function PaymentPage() {
             toast.success('Payment recorded!')
             setForm({ rentalId: '', amount: '', method: '', transactionId: '' })
             fetchPayments()
+            fetchPendingRentals()
         } catch (err) {
             toast.error(err.response?.data?.message || 'Payment failed')
         } finally {
@@ -66,18 +109,27 @@ export default function PaymentPage() {
             <div className={styles.formWrap}>
                 <div className={styles.formHeader}>
                     <h1 className={styles.title}>Process Payment</h1>
-                    <p className={styles.desc}>Record a payment for an existing rental.</p>
+                    <p className={styles.desc}>Choose from your pending rentals and complete payment.</p>
                 </div>
 
                 <form className={styles.form} onSubmit={handleSubmit}>
                     <div className={styles.grid}>
                         <div className={styles.group}>
-                            <label className={styles.label}>Rental ID *</label>
-                            <input type="number" className={styles.input} placeholder="Enter rental ID" value={form.rentalId} onChange={set('rentalId')} required />
+                            <label className={styles.label}>Pending Rental *</label>
+                            <select className={styles.input} value={form.rentalId} onChange={set('rentalId')} required disabled={loadingPending || pendingRentals.length === 0}>
+                                <option value="">
+                                    {loadingPending ? 'Loading pending rentals...' : pendingRentals.length === 0 ? 'No pending rentals' : '-- Select Rental --'}
+                                </option>
+                                {pendingRentals.map((rental) => (
+                                    <option key={rental.id} value={rental.id}>
+                                        #{rental.id} - {rental.item?.name || 'Item'} - ₹{rental.totalAmount}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div className={styles.group}>
                             <label className={styles.label}>Amount (₹) *</label>
-                            <input type="number" className={styles.input} placeholder="Enter amount" min="1" value={form.amount} onChange={set('amount')} required />
+                            <input type="number" className={styles.input} placeholder="Auto-filled from selected rental" min="1" value={form.amount} onChange={set('amount')} required />
                         </div>
                         <div className={styles.group}>
                             <label className={styles.label}>Payment Method *</label>

@@ -4,6 +4,15 @@ import { getItems, getRentals, getUsers } from '../api/axios'
 import ItemCard from '../components/ItemCard'
 import Modal from '../components/Modal'
 import styles from './Home.module.css'
+import img1 from '../assets/299rps.jpg'
+import img2 from '../assets/299 2.jpg'
+import img3 from '../assets/299 3.jpg'
+import img4 from '../assets/299 4.jpg'
+import accessoriesImg from '../assets/accessories.jpg'
+import basicsImg from '../assets/basics.jpg'
+import cordImg from '../assets/cord.jpg'
+import fallImg from '../assets/fall.jpg'
+import premiumHomeImg from '../assets/premium home.jpg'
 
 export default function Home() {
   const nav = useNavigate()
@@ -30,7 +39,14 @@ export default function Home() {
     <div className={styles.page}>
       {/* Hero banner */}
       <section className={styles.heroBanner}>
-        <div className={styles.heroBannerBg} />
+        <div
+          className={styles.heroBannerBg}
+          style={{
+            backgroundImage: `linear-gradient(135deg, rgba(26,26,26,0.72) 0%, rgba(61,43,31,0.58) 60%, rgba(44,44,44,0.68) 100%), url(${premiumHomeImg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
         <div className={styles.heroBannerContent}>
           <p className={styles.heroBannerEye}>New Season</p>
           <h1 className={styles.heroBannerTitle}>Rent Premium<br />Fashion</h1>
@@ -57,20 +73,95 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Category strip */}
-      <section className={styles.catStrip}>
-        {[
-          { label: 'Most Wanted', bg: '#8b7355' },
-          { label: 'Accessories', bg: '#6b5a3e' },
-          { label: 'Basics', bg: '#d4c5b0' },
-          { label: 'It Girl', bg: '#7a6a5a' },
-          { label: 'Jackets', bg: '#1a1a1a' },
-        ].map(c => (
-          <div key={c.label} className={styles.catItem} onClick={() => nav('/browse')}>
-            <div className={styles.catImg} style={{ background: c.bg }} />
-            <span className={styles.catLabel}>{c.label}</span>
+      {/* Category grid */}
+      <section className={styles.catGrid}>
+        <div className={styles.catCard}>
+          <div
+            className={styles.catBg}
+            style={{
+              backgroundImage: `url(${accessoriesImg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
+          <div className={styles.catLabel}>
+            <span className={styles.catName}>Accessories</span>
+            <span className={styles.catSub}>Fine jewellery to bags</span>
           </div>
-        ))}
+        </div>
+        <div className={styles.catCard}>
+          <div
+            className={styles.catBg}
+            style={{
+              backgroundImage: `url(${basicsImg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
+          <div className={styles.catLabel}>
+            <span className={styles.catName}>Basics</span>
+            <span className={styles.catSub}>Foundation of outfits</span>
+          </div>
+        </div>
+        <div className={styles.catCard}>
+          <div
+            className={styles.catBg}
+            style={{
+              backgroundImage: `url(${cordImg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
+          <div className={styles.catLabel}>
+            <span className={styles.catName}>Get Cozy</span>
+            <span className={styles.catSub}>Soft layers & loungewear</span>
+          </div>
+        </div>
+        <div className={styles.catCard}>
+          <div
+            className={styles.catBg}
+            style={{
+              backgroundImage: `url(${fallImg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
+          <div className={styles.catLabel}>
+            <span className={styles.catName}>Jackets</span>
+            <span className={styles.catSub}>Layer up in style</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Editorial section */}
+      <section className={styles.editorial}>
+        <div className={styles.editorialHeader}>
+          <h2 className={styles.editorialTitle}>Trending Now</h2>
+          <button className={styles.editorialLink} onClick={() => nav('/browse')}>View All →</button>
+        </div>
+        <div className={styles.editorialGrid}>
+          {[
+            { label: 'Fall Must-Haves', tag: 'New Arrivals', img: img1 },
+            { label: 'Street Style Edit', tag: 'Trending', img: img2 },
+            { label: 'Date Night', tag: 'Curated', img: img3 },
+            { label: 'Weekend Casual', tag: 'Essentials', img: img4 },
+          ].map((item, i) => (
+            <div key={i} className={styles.editorialCard}>
+              <div
+                className={styles.editorialImg}
+                style={{
+                  backgroundImage: `url(${item.img})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                }}
+              />
+              <div className={styles.editorialCardLabel}>
+                <span className={styles.editorialTag}>{item.tag}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Featured items */}

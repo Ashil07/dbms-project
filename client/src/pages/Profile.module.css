@@ -1,0 +1,234 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.hero {
+  position: relative;
+  min-height: 240px;
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, #151515 0%, #3a291d 55%, #212121 100%);
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.1));
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  padding: 2rem 1.5rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.heroEyebrow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 0.5rem;
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  line-height: 1.1;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.heroSub {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.profileCard,
+.actionsCard,
+.statTile {
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+}
+
+.profileCard {
+  padding: 1.5rem;
+}
+
+.userHead {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.avatar {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #5f69d8 0%, #7a4aa8 100%);
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.userName {
+  font-size: 1.3rem;
+  margin-bottom: 0.25rem;
+}
+
+.userEmail {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.infoBlock {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 0.9rem;
+}
+
+.infoLabel {
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  margin-bottom: 0.35rem;
+}
+
+.infoValue,
+.infoValueMono {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.infoValueMono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.statTile {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.statNumber {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.statLabel {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.actionsCard {
+  padding: 1.25rem;
+}
+
+.actionsTitle {
+  margin-bottom: 0.9rem;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.actionsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.actionBtn {
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.actionBtn:hover {
+  border-color: var(--text);
+  transform: translateY(-1px);
+}
+
+.signOutBtn {
+  background: #1f1f1f;
+  color: #fff;
+  border-color: #3a3a3a;
+}
+
+.signOutBtn:hover {
+  background: #131313;
+  border-color: #666;
+}
+
+.emptyState {
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.emptyTitle {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .actionsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    min-height: 200px;
+  }
+
+  .infoGrid,
+  .stats,
+  .actionsGrid {
+    grid-template-columns: 1fr;
+  }
+}

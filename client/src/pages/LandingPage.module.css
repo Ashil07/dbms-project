@@ -197,6 +197,10 @@
   width: 100%;
   aspect-ratio: 3/4;
   transition: transform 0.4s ease;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: block;
 }
 
 .editorialCardLabel {

@@ -7,16 +7,16 @@ import fallImg from '../assets/fall.jpg'
 import itGirlImg from '../assets/IT girl.jpg'
 import jacketsImg from '../assets/jackets.jpg'
 import premiumOutfitImg from '../assets/premium outfit.jpg'
-import heroright from '../assets/landright.jpg'
 import suiteWomenImg from '../assets/suite women.jpg'
 import traditionalWearImg from '../assets/traditional wear.jpg'
-import img1 from '../assets/299rps.jpg'
+import img1 from '../assets/299rs.jpg'
 import img2 from '../assets/299 2.jpg'
 import img3 from '../assets/299 3.jpg'
 import img4 from '../assets/299 4.jpg'
+import heroright from '../assets/landing page hero 2.jpg'
 
 const categories = [
-  { label: 'premiumOutfitImg', sub: 'The pieces everyone is reaching for', img: premiumOutfitImg, span: 'wide' },
+  { label: 'Most Wanted', sub: 'The pieces everyone is reaching for', img: premiumOutfitImg, span: 'wide' },
   { label: 'Accessories', sub: 'From fine jewellery to statement bags', img: accessoriesImg, span: 'normal' },
   { label: 'Get Cozy', sub: 'Knitwear, loungewear & soft layers', img: cordImg, span: 'normal' },
   { label: 'New In', sub: 'Just landed this week', img: suiteWomenImg, span: 'normal' },
@@ -32,10 +32,10 @@ const heroImages = {
 }
 
 const editorial = [
-  { label: 'Fall Must-Haves', tag: 'New Arrivals', img: img1 },
-  { label: 'Street Style Edit', tag: 'Trending', img: img2 },
-  { label: 'Date Night', tag: 'Curated', img: img3 },
-  { label: 'Weekend Casual', tag: 'Essentials', img: img4 },
+  { label: 'Fall Must-Haves', tag: 'New Arrivals' },
+  { label: 'Street Style Edit', tag: 'Trending' },
+  { label: 'Date Night', tag: 'Curated' },
+  { label: 'Weekend Casual', tag: 'Essentials' },
 ]
 
 export default function LandingPage() {
@@ -60,14 +60,11 @@ export default function LandingPage() {
           <Link to="/signup" className={styles.heroBtn}>Shop Now</Link>
         </div>
         <div className={styles.heroRight}>
-          <div
-            className={styles.heroImgPlaceholder}
-            style={{
+          <div className={styles.heroImgPlaceholder} style={{
               backgroundImage: `url(${heroImages.right})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-            }}
-          />
+            }} />
         </div>
       </section>
 
@@ -115,22 +112,28 @@ export default function LandingPage() {
       <section className={styles.editorial}>
         <div className={styles.editorialHeader}>
           <h2 className={styles.editorialTitle}>Fall Must-Haves</h2>
-          <Link to="/browse" className={styles.editorialLink}>View All →</Link>
+          <Link to="/signup" className={styles.editorialLink}>View All →</Link>
         </div>
         <div className={styles.editorialGrid}>
-          {editorial.map((item, i) => (
-            <div key={i} className={styles.editorialCard}>
+          {[
+            [
+              { img: img1, aspect: 'tall' },
+              { img: img2, aspect: 'tall' },
+              { img: img3, aspect: 'tall' },
+              { img: img4, aspect: 'tall' },
+            ]
+          ].map((item, i) => (
+            <div key={i} className={`${styles.editorialCard} ${item.aspect === 'tall' ? styles.tall : ''}`}>
               <div
                 className={styles.editorialImg}
                 style={{
                   backgroundImage: `url(${item.img})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
                 }}
               />
               <div className={styles.editorialCardLabel}>
-                <span className={styles.editorialTag}>{item.tag}</span>
+                <span className={styles.editorialTag}>Rent from ₹299/day</span>
               </div>
             </div>
           ))}
