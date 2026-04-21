@@ -8,6 +8,7 @@ import LandingPage from './pages/LandingPage'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
+import Profile from './pages/Profile'
 import Home from './pages/Home'
 import Browse from './pages/Browse'
 import RentPage from './pages/RentPage'
@@ -46,6 +47,11 @@ export default function App() {
             <Route path="/dashboard" element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            } />
+            <Route path="/profile" element={
+              <PrivateRoute>
+                <Profile />
               </PrivateRoute>
             } />
             <Route path="/home" element={

@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import styles from './Login.module.css'
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: '', password: '' })
+  const [formData, setFormData] = useState({ email: '', password: '', phone: '' })
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const { login } = useAuth()
@@ -25,8 +25,10 @@ export default function Login() {
       // Mock authentication - replace with actual API call
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      if (formData.email && formData.password) {
+      if (formData.email && formData.password && formData.phone) {
         login()
+        localStorage.setItem('userEmail', formData.email)
+        localStorage.setItem('userPhone', formData.phone)
         toast.success('Welcome back!')
         navigate('/dashboard')
       } else {
@@ -60,7 +62,11 @@ export default function Login() {
             </div>
             <div className={styles.formGroup}>
               <label htmlFor="password" className={styles.formLabel}>Password</label>
-              <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} className={styles.formInput} placeholder="••••••••" required />
+              <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} className={styles.formInput} placeholder="Your password" required />
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="phone" className={styles.formLabel}>Phone Number</label>
+              <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} className={styles.formInput} placeholder="+91 98765 43210" required />
             </div>
             <button type="submit" disabled={loading} className={styles.loginButton}>
               {loading ? 'Signing in...' : 'Sign In'}

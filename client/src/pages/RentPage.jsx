@@ -2,16 +2,27 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getItems, createRental, validateCoupon, getRentals } from '../api/axios'
+import { useAuth } from '../contexts/AuthContext'
 import styles from './FormPage.module.css'
 
 export default function RentPage() {
     const location = useLocation()
     const nav = useNavigate()
     const prefill = location.state?.item
+    
+    // Generate user ID if not available
+    const generateUserId = (email) => {
+        if (!email) return 'USR000000'
+        const hash = email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+        return `USR${String(hash).padStart(6, '0').slice(-6)}`
+    }
+
+    const userEmail = localStorage.getItem('userEmail') || 'guest@example.com'
+    const userId = generateUserId(userEmail)
 
     const [items, setItems] = useState([])
     const [form, setForm] = useState({
-        userId: '',
+        userId: userId,
         itemId: prefill?.id || '',
         startDate: '',
         endDate: '',
@@ -28,6 +39,8 @@ export default function RentPage() {
             .catch(() => { })
     }, [])
 
+    const selectedItem = items.find((i) => i.id === parseInt(form.itemId)) || prefill
+
     // Fetch rentals for selected item to check availability
     useEffect(() => {
         if (selectedItem) {
@@ -40,8 +53,6 @@ export default function RentPage() {
                 .catch(() => { })
         }
     }, [selectedItem])
-
-    const selectedItem = items.find((i) => i.id === parseInt(form.itemId)) || prefill
 
     const days =
         form.startDate && form.endDate
@@ -98,7 +109,7 @@ export default function RentPage() {
         setSubmitting(true)
         try {
             const r = await createRental({
-                userId: parseInt(form.userId),
+                userId: userId,
                 itemId: parseInt(form.itemId),
                 startDate: form.startDate,
                 endDate: form.endDate,
@@ -106,7 +117,7 @@ export default function RentPage() {
             })
             setResult(r.data.data)
             toast.success('Rental created successfully!')
-            setForm({ userId: '', itemId: '', startDate: '', endDate: '', couponCode: '' })
+            setForm({ userId: userId, itemId: '', startDate: '', endDate: '', couponCode: '' })
             setCouponData(null)
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to create rental')
@@ -125,8 +136,9 @@ export default function RentPage() {
                 <form className={styles.form} onSubmit={handleSubmit}>
                     <div className={styles.grid}>
                         <div className={styles.group}>
-                            <label className={styles.label}>User ID *</label>
-                            <input type="number" className={styles.input} placeholder="Your user ID" value={form.userId} onChange={set('userId')} required />
+                            <label className={styles.label}>User ID</label>
+                            <input type="text" className={styles.input} placeholder="Your user ID" value={userId} readOnly style={{ background: 'var(--bg-secondary)', cursor: 'not-allowed' }} />
+                            <small style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Auto-filled from your profile</small>
                         </div>
                         <div className={styles.group}>
                             <label className={styles.label}>Select Item *</label>

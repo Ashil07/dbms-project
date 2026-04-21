@@ -61,6 +61,7 @@ export default function Navbar() {
           {isLoggedIn ? (
             <>
               <NavLink to="/dashboard" className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}>Dashboard</NavLink>
+              <NavLink to="/profile" className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}>Profile</NavLink>
               <button className={styles.logoutBtn} onClick={handleLogout}>Sign Out</button>
             </>
           ) : (
@@ -88,6 +89,7 @@ export default function Navbar() {
                 </NavLink>
               ))}
               <NavLink to="/dashboard" className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`}>Dashboard</NavLink>
+              <NavLink to="/profile" className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`}>Profile</NavLink>
               <button className={styles.mobileLink} onClick={handleLogout}>Sign Out</button>
             </>
           ) : (
