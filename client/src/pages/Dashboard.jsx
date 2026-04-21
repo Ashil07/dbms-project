@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getItems, getRentals, getUsers } from '../api/axios'
 import styles from './Dashboard.module.css'
+import premiumHomeImg from '../assets/premium home.jpg'
+import premiumOutfitImg from '../assets/premium outfit.jpg'
+import traditionalWearImg from '../assets/traditional wear.jpg'
+import landRightImg from '../assets/landright.jpg'
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -57,7 +61,14 @@ export default function Dashboard() {
       {/* Action grid */}
       <div className={styles.actionGrid}>
         <div className={styles.actionCard} onClick={() => navigate('/browse')}>
-          <div className={styles.actionCardBg} style={{ background: '#1a1a1a' }} />
+          <div
+            className={styles.actionCardBg}
+            style={{
+              backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.25)), url(${premiumHomeImg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
           <div className={styles.actionCardContent}>
             <span className={styles.actionEye}>Explore</span>
             <h3 className={styles.actionTitle}>Browse Items</h3>
@@ -66,7 +77,14 @@ export default function Dashboard() {
           </div>
         </div>
         <div className={styles.actionCard} onClick={() => navigate('/upload')}>
-          <div className={styles.actionCardBg} style={{ background: '#8b7355' }} />
+          <div
+            className={styles.actionCardBg}
+            style={{
+              backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.25)), url(${premiumOutfitImg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
           <div className={styles.actionCardContent}>
             <span className={styles.actionEye}>Contribute</span>
             <h3 className={styles.actionTitle}>List New Item</h3>
@@ -75,7 +93,14 @@ export default function Dashboard() {
           </div>
         </div>
         <div className={styles.actionCard} onClick={() => navigate('/rentals')}>
-          <div className={styles.actionCardBg} style={{ background: '#6b5a3e' }} />
+          <div
+            className={styles.actionCardBg}
+            style={{
+              backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.25)), url(${traditionalWearImg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
           <div className={styles.actionCardContent}>
             <span className={styles.actionEye}>Manage</span>
             <h3 className={styles.actionTitle}>My Rentals</h3>
@@ -84,7 +109,14 @@ export default function Dashboard() {
           </div>
         </div>
         <div className={styles.actionCard} onClick={() => navigate('/payment')}>
-          <div className={styles.actionCardBg} style={{ background: '#2c2c2c' }} />
+          <div
+            className={styles.actionCardBg}
+            style={{
+              backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.25)), url(${landRightImg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
           <div className={styles.actionCardContent}>
             <span className={styles.actionEye}>Finance</span>
             <h3 className={styles.actionTitle}>Payments</h3>
