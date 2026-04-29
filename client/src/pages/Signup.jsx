@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { createUser } from '../api/axios'
+import api from '../api/axios'
 import styles from './Signup.module.css'
 
 export default function Signup() {
@@ -21,7 +22,7 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
       // Validate passwords match
       if (formData.password !== formData.confirmPassword) {
@@ -38,23 +39,29 @@ export default function Signup() {
       }
 
       if (formData.name && formData.email && formData.password) {
-        const response = await createUser({
+        await createUser({
           name: formData.name.trim(),
           email: formData.email.trim(),
           password: formData.password,
         })
-        const createdUser = response.data?.data
-        if (createdUser?.id) localStorage.setItem('userId', String(createdUser.id))
-        localStorage.setItem('userEmail', formData.email.trim())
-        localStorage.setItem('userName', formData.name.trim())
-        login()
+
+        // Auto-login after signup
+        const loginRes = await api.post('/auth/login', {
+          email: formData.email.trim(),
+          password: formData.password,
+        })
+        const { token, user } = loginRes.data.data
+        login(token, user)
+        localStorage.setItem('userEmail', user.email)
+        localStorage.setItem('userName', user.name)
+        localStorage.setItem('userId', String(user.id))
         toast.success('Welcome to ThreadRent!')
         navigate('/dashboard')
       } else {
         toast.error('Please fill in all fields')
       }
     } catch (error) {
-      toast.error('Signup failed')
+      toast.error(error.response?.data?.message || 'Signup failed')
     } finally {
       setLoading(false)
     }

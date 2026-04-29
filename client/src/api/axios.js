@@ -5,6 +5,15 @@ const api = axios.create({
     timeout: 15000,
 })
 
+// Attach JWT token to every request
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+})
+
 // Items
 export const getItems = (params) => api.get('/items', { params })
 export const getItemById = (id) => api.get(`/items/${id}`)

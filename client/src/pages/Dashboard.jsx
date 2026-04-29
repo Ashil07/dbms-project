@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getItems, getRentals, getUsers } from '../api/axios'
+import { useAuth } from '../contexts/AuthContext'
 import styles from './Dashboard.module.css'
 import premiumHomeImg from '../assets/premium home.jpg'
 import premiumOutfitImg from '../assets/premium outfit.jpg'
@@ -9,25 +10,33 @@ import landRightImg from '../assets/landright.jpg'
 
 export default function Dashboard() {
   const navigate = useNavigate()
+  const { isAdmin, user } = useAuth()
   const [stats, setStats] = useState({ items: 0, rentals: 0, users: 0, activeRentals: 0 })
   const [recentRentals, setRecentRentals] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([getItems({ limit: 100 }), getRentals(), getUsers()])
-      .then(([itemsRes, rentalsRes, usersRes]) => {
+    const requests = [getItems({ limit: 100 }), getRentals()]
+    if (isAdmin) requests.push(getUsers())
+
+    Promise.all(requests)
+      .then((responses) => {
+        const itemsRes = responses[0]
+        const rentalsRes = responses[1]
+        const usersRes = isAdmin ? responses[2] : null
+
         const rentals = rentalsRes.data.data || []
         setStats({
           items: itemsRes.data.pagination?.total || 0,
           rentals: rentals.length,
-          users: usersRes.data.data?.length || 0,
+          users: isAdmin ? (usersRes?.data.data?.length || 0) : 0,
           activeRentals: rentals.filter(r => r.status === 'active').length,
         })
         setRecentRentals(rentals.slice(0, 5))
       })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [isAdmin])
 
   const statusColor = s => s === 'active' ? styles.statusActive : s === 'returned' ? styles.statusReturned : styles.statusCancelled
 
@@ -46,9 +55,9 @@ export default function Dashboard() {
       <div className={styles.statsRow}>
         {[
           { label: 'Total Items', value: stats.items, sub: 'in catalogue' },
-          { label: 'Total Rentals', value: stats.rentals, sub: 'all time' },
-          { label: 'Active Rentals', value: stats.activeRentals, sub: 'currently out' },
-          { label: 'Members', value: stats.users, sub: 'registered' },
+          { label: isAdmin ? 'Total Rentals' : 'My Rentals', value: stats.rentals, sub: 'all time' },
+          { label: isAdmin ? 'Active Rentals' : 'My Active Rentals', value: stats.activeRentals, sub: 'currently out' },
+          ...(isAdmin ? [{ label: 'Members', value: stats.users, sub: 'registered' }] : []),
         ].map(s => (
           <div key={s.label} className={styles.statCard}>
             <span className={styles.statValue}>{loading ? '—' : s.value}</span>
@@ -76,22 +85,24 @@ export default function Dashboard() {
             <span className={styles.actionArrow}>→</span>
           </div>
         </div>
-        <div className={styles.actionCard} onClick={() => navigate('/upload')}>
-          <div
-            className={styles.actionCardBg}
-            style={{
-              backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.25)), url(${premiumOutfitImg})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          />
-          <div className={styles.actionCardContent}>
-            <span className={styles.actionEye}>Contribute</span>
-            <h3 className={styles.actionTitle}>List New Item</h3>
-            <p className={styles.actionDesc}>Add your clothing to the marketplace</p>
-            <span className={styles.actionArrow}>→</span>
+        {isAdmin && (
+          <div className={styles.actionCard} onClick={() => navigate('/upload')}>
+            <div
+              className={styles.actionCardBg}
+              style={{
+                backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.25)), url(${premiumOutfitImg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
+            <div className={styles.actionCardContent}>
+              <span className={styles.actionEye}>Contribute</span>
+              <h3 className={styles.actionTitle}>List New Item</h3>
+              <p className={styles.actionDesc}>Add your clothing to the marketplace</p>
+              <span className={styles.actionArrow}>→</span>
+            </div>
           </div>
-        </div>
+        )}
         <div className={styles.actionCard} onClick={() => navigate('/rentals')}>
           <div
             className={styles.actionCardBg}
@@ -103,7 +114,7 @@ export default function Dashboard() {
           />
           <div className={styles.actionCardContent}>
             <span className={styles.actionEye}>Manage</span>
-            <h3 className={styles.actionTitle}>My Rentals</h3>
+            <h3 className={styles.actionTitle}>{isAdmin ? 'All Rentals' : 'My Rentals'}</h3>
             <p className={styles.actionDesc}>View orders, track returns, manage history</p>
             <span className={styles.actionArrow}>→</span>
           </div>
@@ -119,8 +130,8 @@ export default function Dashboard() {
           />
           <div className={styles.actionCardContent}>
             <span className={styles.actionEye}>Finance</span>
-            <h3 className={styles.actionTitle}>Payments</h3>
-            <p className={styles.actionDesc}>Record and track all payment transactions</p>
+            <h3 className={styles.actionTitle}>{isAdmin ? 'Payments' : 'My Payments'}</h3>
+            <p className={styles.actionDesc}>Record and track payment transactions</p>
             <span className={styles.actionArrow}>→</span>
           </div>
         </div>

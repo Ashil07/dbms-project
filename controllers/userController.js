@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 
 const getAllUsers = async (req, res, next) => {
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Access denied. Admin only.' });
+        }
         const users = await prisma.user.findMany({
             select: { id: true, name: true, email: true, phone: true, address: true, createdAt: true },
             orderBy: { createdAt: 'desc' },
@@ -33,8 +36,13 @@ const createUser = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
     try {
+        const userId = parseInt(req.params.id);
+        // Users can only view their own profile; admins can view any
+        if (req.user.role !== 'admin' && req.user.id !== userId) {
+            return res.status(403).json({ success: false, message: 'Access denied. You can only view your own profile.' });
+        }
         const user = await prisma.user.findUnique({
-            where: { id: parseInt(req.params.id) },
+            where: { id: userId },
             select: { id: true, name: true, email: true, phone: true, address: true, createdAt: true },
         });
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });

@@ -6,7 +6,13 @@ const getAllRentals = async (req, res, next) => {
         const { status, userId } = req.query;
         const where = {};
         if (status) where.status = status;
-        if (userId) where.userId = parseInt(userId);
+
+        // Normal users can only see their own rentals
+        if (req.user.role !== 'admin') {
+            where.userId = req.user.id;
+        } else if (userId) {
+            where.userId = parseInt(userId);
+        }
 
         const rentals = await prisma.rental.findMany({
             where,
@@ -38,6 +44,12 @@ const getRentalById = async (req, res, next) => {
             },
         });
         if (!rental) return res.status(404).json({ success: false, message: 'Rental not found' });
+
+        // Users can only access their own rentals; admins can access any
+        if (req.user.role !== 'admin' && rental.userId !== req.user.id) {
+            return res.status(403).json({ success: false, message: 'Access denied. You can only view your own rentals.' });
+        }
+
         res.json({ success: true, data: rental });
     } catch (error) {
         next(error);
@@ -47,10 +59,11 @@ const getRentalById = async (req, res, next) => {
 // POST /api/rentals - create rental
 const createRental = async (req, res, next) => {
     try {
-        const { userId, itemId, startDate, endDate, couponCode } = req.body;
+        const { itemId, startDate, endDate, couponCode } = req.body;
+        const userId = req.user.id;
 
-        if (!userId || !itemId || !startDate || !endDate) {
-            return res.status(400).json({ success: false, message: 'userId, itemId, startDate, and endDate are required' });
+        if (!itemId || !startDate || !endDate) {
+            return res.status(400).json({ success: false, message: 'itemId, startDate, and endDate are required' });
         }
 
         const item = await prisma.clothingItem.findUnique({ where: { id: parseInt(itemId) } });
@@ -114,6 +127,11 @@ const returnRental = async (req, res, next) => {
         const rental = await prisma.rental.findUnique({ where: { id: rentalId }, include: { item: true } });
         if (!rental) return res.status(404).json({ success: false, message: 'Rental not found' });
         if (rental.status === 'returned') return res.status(400).json({ success: false, message: 'Already returned' });
+
+        // Only the rental owner or an admin can return an item
+        if (req.user.role !== 'admin' && rental.userId !== req.user.id) {
+            return res.status(403).json({ success: false, message: 'Access denied. You can only return items you rented.' });
+        }
 
         const returnDate = new Date();
         let lateFee = 0;

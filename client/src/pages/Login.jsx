@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
+import api from '../api/axios'
 import styles from './Login.module.css'
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: '', password: '', phone: '' })
+  const [formData, setFormData] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const { login } = useAuth()
@@ -20,31 +21,22 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
-      // Mock authentication - replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      if (formData.email && formData.password && formData.phone) {
-        // Generate a simple numeric user ID based on email hash
-        const generateUserId = (email) => {
-          const hash = email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-          return (hash % 100000) + 1 // Keep it within reasonable range
-        }
-        
-        const userId = generateUserId(formData.email)
-        
-        login()
-        localStorage.setItem('userEmail', formData.email)
-        localStorage.setItem('userPhone', formData.phone)
-        localStorage.setItem('userId', userId.toString())
-        toast.success('Welcome back!')
-        navigate('/dashboard')
-      } else {
-        toast.error('Please fill in all fields')
-      }
-    } catch (error) {
-      toast.error('Login failed')
+      const res = await api.post('/auth/login', {
+        email: formData.email,
+        password: formData.password,
+      })
+
+      const { token, user } = res.data.data
+      login(token, user)
+      localStorage.setItem('userEmail', user.email)
+      localStorage.setItem('userName', user.name)
+      localStorage.setItem('userId', String(user.id))
+      toast.success('Welcome back!')
+      navigate('/dashboard')
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Login failed')
     } finally {
       setLoading(false)
     }
@@ -72,10 +64,6 @@ export default function Login() {
             <div className={styles.formGroup}>
               <label htmlFor="password" className={styles.formLabel}>Password</label>
               <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} className={styles.formInput} placeholder="Your password" required />
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="phone" className={styles.formLabel}>Phone Number</label>
-              <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} className={styles.formInput} placeholder="+91 98765 43210" required />
             </div>
             <button type="submit" disabled={loading} className={styles.loginButton}>
               {loading ? 'Signing in...' : 'Sign In'}

@@ -9,6 +9,7 @@ const categoryRoutes = require('./routes/categories');
 const userRoutes = require('./routes/users');
 const couponRoutes = require('./routes/coupons');
 const reviewRoutes = require('./routes/reviews');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/rentals', rentalRoutes);
 app.use('/api/payments', paymentRoutes);

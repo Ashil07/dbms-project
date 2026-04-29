@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import Navbar from './components/Navbar'
 import PrivateRoute from './components/PrivateRoute'
+import AdminRoute from './components/AdminRoute'
 import LandingPage from './pages/LandingPage'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
@@ -70,9 +71,9 @@ export default function App() {
               </PrivateRoute>
             } />
             <Route path="/upload" element={
-              <PrivateRoute>
+              <AdminRoute>
                 <UploadItem />
-              </PrivateRoute>
+              </AdminRoute>
             } />
             <Route path="/payment" element={
               <PrivateRoute>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { getItems, createRental, validateCoupon, getRentals, getUsers } from '../api/axios'
+import { getItems, createRental, validateCoupon, getRentals } from '../api/axios'
 import { useAuth } from '../contexts/AuthContext'
 import styles from './FormPage.module.css'
 
@@ -10,50 +10,12 @@ export default function RentPage() {
     const nav = useNavigate()
     const { isLoggedIn } = useAuth()
     const prefill = location.state?.item
-    const [resolvedUserId, setResolvedUserId] = useState(null)
-    const [resolvingUser, setResolvingUser] = useState(true)
-
     useEffect(() => {
         if (!isLoggedIn) {
             toast.error('Please log in to rent items')
             nav('/login')
             return
         }
-
-        const resolveUser = async () => {
-            setResolvingUser(true)
-            try {
-                const savedUserId = localStorage.getItem('userId')
-                const parsedSavedId = Number.parseInt(savedUserId || '', 10)
-                if (Number.isInteger(parsedSavedId) && parsedSavedId > 0) {
-                    setResolvedUserId(parsedSavedId)
-                    return
-                }
-
-                const userEmail = localStorage.getItem('userEmail')
-                if (!userEmail) {
-                    setResolvedUserId(null)
-                    return
-                }
-
-                const usersResponse = await getUsers()
-                const users = usersResponse.data?.data || []
-                const matchedUser = users.find((u) => u.email?.toLowerCase() === userEmail.toLowerCase())
-
-                if (matchedUser?.id) {
-                    setResolvedUserId(matchedUser.id)
-                    localStorage.setItem('userId', String(matchedUser.id))
-                } else {
-                    setResolvedUserId(null)
-                }
-            } catch {
-                setResolvedUserId(null)
-            } finally {
-                setResolvingUser(false)
-            }
-        }
-
-        resolveUser()
     }, [isLoggedIn, nav])
 
     const [items, setItems] = useState([])
@@ -134,7 +96,6 @@ export default function RentPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!resolvedUserId) return toast.error('Unable to identify your account. Please sign in again.')
         if (!form.itemId || !form.startDate || !form.endDate)
             return toast.error('Please fill all required fields')
         if (days <= 0) return toast.error('End date must be after start date')
@@ -148,7 +109,6 @@ export default function RentPage() {
         setSubmitting(true)
         try {
             const r = await createRental({
-                userId: resolvedUserId,
                 itemId: parseInt(form.itemId),
                 startDate: form.startDate,
                 endDate: form.endDate,
@@ -174,20 +134,6 @@ export default function RentPage() {
                 </div>
                 <form className={styles.form} onSubmit={handleSubmit}>
                     <div className={styles.grid}>
-                        <div className={styles.group}>
-                            <label className={styles.label}>User ID</label>
-                            <input
-                                type="text"
-                                className={styles.input}
-                                placeholder="Your user ID"
-                                value={resolvingUser ? 'Loading...' : (resolvedUserId || 'Not linked')}
-                                readOnly
-                                style={{ background: 'var(--bg-secondary)', cursor: 'not-allowed' }}
-                            />
-                            <small style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                                {resolvingUser ? 'Fetching your profile...' : resolvedUserId ? 'Auto-filled from your profile' : 'User not found. Please sign in again.'}
-                            </small>
-                        </div>
                         <div className={styles.group}>
                             <label className={styles.label}>Select Item *</label>
                             <select className={styles.input} value={form.itemId} onChange={set('itemId')} required>
@@ -247,7 +193,7 @@ export default function RentPage() {
                         </div>
                     )}
 
-                    <button type="submit" className={`${styles.btn} ${styles.btnPrimary} ${styles.fullWidth}`} disabled={submitting || !isAvailable || resolvingUser || !resolvedUserId}>
+                    <button type="submit" className={`${styles.btn} ${styles.btnPrimary} ${styles.fullWidth}`} disabled={submitting || !isAvailable}>
                         {submitting ? '⏳ Creating Rental...' : isAvailable ? 'Confirm Rental' : 'Item Not Available'}
                     </button>
                 </form>

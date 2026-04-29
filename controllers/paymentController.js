@@ -8,10 +8,17 @@ const getAllPayments = async (req, res, next) => {
         if (status) where.status = status;
         if (rentalId) where.rentalId = parseInt(rentalId);
 
+        // Normal users can only see payments for their own rentals
+        let rentalFilter = {};
+        if (req.user.role !== 'admin') {
+            rentalFilter = { userId: req.user.id };
+        }
+
         const payments = await prisma.payment.findMany({
             where,
             include: {
                 rental: {
+                    where: rentalFilter,
                     include: {
                         user: { select: { id: true, name: true, email: true } },
                         item: { select: { id: true, name: true } },
@@ -20,7 +27,10 @@ const getAllPayments = async (req, res, next) => {
             },
             orderBy: { createdAt: 'desc' },
         });
-        res.json({ success: true, data: payments });
+
+        // Filter out payments where rental was excluded by the where clause for non-admins
+        const filtered = req.user.role === 'admin' ? payments : payments.filter(p => p.rental !== null);
+        res.json({ success: true, data: filtered });
     } catch (error) {
         next(error);
     }
@@ -34,6 +44,11 @@ const getPaymentById = async (req, res, next) => {
             include: { rental: { include: { user: true, item: true } } },
         });
         if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
+
+        if (req.user.role !== 'admin' && payment.rental.userId !== req.user.id) {
+            return res.status(403).json({ success: false, message: 'Access denied. You can only view payments for your own rentals.' });
+        }
+
         res.json({ success: true, data: payment });
     } catch (error) {
         next(error);
@@ -51,6 +66,11 @@ const createPayment = async (req, res, next) => {
 
         const rental = await prisma.rental.findUnique({ where: { id: parseInt(rentalId) } });
         if (!rental) return res.status(404).json({ success: false, message: 'Rental not found' });
+
+        // Users can only pay for their own rentals
+        if (req.user.role !== 'admin' && rental.userId !== req.user.id) {
+            return res.status(403).json({ success: false, message: 'Access denied. You can only pay for your own rentals.' });
+        }
 
         const existing = await prisma.payment.findUnique({ where: { rentalId: parseInt(rentalId) } });
         if (existing) return res.status(400).json({ success: false, message: 'Payment already exists for this rental' });
@@ -88,6 +108,11 @@ const createPayment = async (req, res, next) => {
 // PATCH /api/payments/:id/refund
 const refundPayment = async (req, res, next) => {
     try {
+        // Only admins can process refunds
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Access denied. Only admins can process refunds.' });
+        }
+
         const payment = await prisma.payment.findUnique({ where: { id: parseInt(req.params.id) } });
         if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
         if (payment.status === 'refunded') return res.status(400).json({ success: false, message: 'Already refunded' });

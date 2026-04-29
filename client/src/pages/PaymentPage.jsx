@@ -14,7 +14,6 @@ const statusClass = {
 export default function PaymentPage() {
     const location = useLocation()
     const prefill = location.state || {}
-    const loggedInEmail = localStorage.getItem('userEmail')
 
     const [form, setForm] = useState({
         rentalId: prefill.rentalId || '',
@@ -39,13 +38,10 @@ export default function PaymentPage() {
 
     const fetchPendingRentals = () => {
         setLoadingPending(true)
-        getRentals()
+        getRentals({ status: 'active' })
             .then((r) => {
                 const rentals = r.data.data || []
-                const mine = loggedInEmail
-                    ? rentals.filter((rental) => rental.user?.email?.toLowerCase() === loggedInEmail.toLowerCase())
-                    : rentals
-                const pending = mine.filter((rental) => !rental.payment)
+                const pending = rentals.filter((rental) => !rental.payment)
                 setPendingRentals(pending)
 
                 if (prefill.rentalId) {

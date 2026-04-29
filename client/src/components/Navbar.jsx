@@ -4,22 +4,22 @@ import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
 import styles from './Navbar.module.css'
 
-const authLinks = [
-  { to: '/home', label: 'Home' },
-  { to: '/browse', label: 'Browse' },
-  { to: '/rent', label: 'Rent' },
-  { to: '/upload', label: 'List Item' },
-  { to: '/rentals', label: 'Rentals' },
-  { to: '/payment', label: 'Payment' },
-]
-
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const { isLoggedIn, logout } = useAuth()
+  const { isLoggedIn, isAdmin, logout } = useAuth()
   const { isDark, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
+
+  const authLinks = [
+    { to: '/home', label: 'Home' },
+    { to: '/browse', label: 'Browse' },
+    { to: '/rent', label: 'Rent' },
+    ...(isAdmin ? [{ to: '/upload', label: 'List Item' }] : []),
+    { to: '/rentals', label: isAdmin ? 'Rentals' : 'My Rentals' },
+    { to: '/payment', label: 'Payment' },
+  ]
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)

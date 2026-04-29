@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { getAllRentals, getRentalById, createRental, returnRental } = require('../controllers/rentalController');
+const { authenticate } = require('../middleware/auth');
+
+// All rental routes require authentication
+router.use(authenticate);
 
 // GET /api/rentals
 router.get('/', getAllRentals);
