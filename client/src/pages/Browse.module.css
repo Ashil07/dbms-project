@@ -85,9 +85,9 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
+  gap: 1.25rem;
+  background: transparent;
+  border: none;
 }
 
 .skeleton {

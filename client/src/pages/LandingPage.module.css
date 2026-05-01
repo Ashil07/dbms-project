@@ -55,27 +55,28 @@
 }
 
 .heroSub {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
   line-height: 1.6;
-  max-width: 220px;
-  margin-bottom: 2rem;
+  max-width: 340px;
+  margin-bottom: 2.25rem;
 }
 
 .heroBtn {
   display: inline-block;
-  padding: 0.65rem 2rem;
+  padding: 0.85rem 2.5rem;
   background: var(--text);
   color: var(--bg);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  transition: opacity var(--transition);
+  transition: transform 0.2s ease, opacity var(--transition);
 }
 
 .heroBtn:hover {
-  opacity: 0.75;
+  opacity: 0.85;
+  transform: translateY(-2px);
 }
 
 /* ── Category Grids ── */
@@ -103,9 +104,6 @@
   border-right: none;
 }
 
-.catWide {
-  /* already handled by grid */
-}
 
 .catBg {
   width: 100%;
@@ -332,6 +330,201 @@
   border-color: #fff;
 }
 
+.trustSignals {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.trustItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.trustItem svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ── How It Works ── */
+.howItWorks {
+  padding: 5rem 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+}
+
+.sectionDesc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.sectionLink {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: color var(--transition);
+  white-space: nowrap;
+}
+
+.sectionLink:hover {
+  color: var(--text);
+}
+
+.stepsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.stepCard {
+  text-align: center;
+  padding: 2rem 1rem;
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stepCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.stepNum {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-faint);
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.stepTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.01em;
+}
+
+.stepDesc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ── Product Sections ── */
+.productSection {
+  padding: 4rem 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.productSection .sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  text-align: left;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+}
+
+.productScroll {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+}
+
+.productScroll::-webkit-scrollbar {
+  height: 3px;
+}
+
+.productScroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.productScroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 2px;
+}
+
+.productCard {
+  flex: 0 0 220px;
+  scroll-snap-align: start;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.productCard:hover {
+  transform: translateY(-6px);
+}
+
+.productImg {
+  width: 100%;
+  aspect-ratio: 3/4;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-bottom: 0.75rem;
+}
+
+.productInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.productTitle {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+.productPrice {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── Fade In Animation ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fadeIn {
+  opacity: 0;
+  animation: fadeInUp 0.7s ease forwards;
+}
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .hero {
@@ -369,6 +562,15 @@
 
   .editorialGrid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .stepsRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .productCard {
+    flex: 0 0 180px;
   }
 
   .features {
