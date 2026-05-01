@@ -8,6 +8,8 @@
         "dev": "nodemon server.js",
         "dev:client": "cd client && npm run dev",
         "dev:all": "concurrently \"npm run dev\" \"npm run dev:client\"",
+        "postinstall": "prisma generate",
+        "vercel-build": "prisma generate && cd client && npm install && npm run build",
         "prisma:generate": "prisma generate",
         "prisma:migrate": "prisma migrate dev",
         "prisma:studio": "prisma studio"

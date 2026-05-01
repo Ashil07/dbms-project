@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: cloth-rental-api
+    runtime: node
+    plan: free
+    region: oregon               # closest free region; change if needed
+    buildCommand: npm install && npx prisma generate
+    startCommand: node server.js
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # All secrets below must be set manually in the Render dashboard
+      # (sync: false means Render will prompt you to enter the value)
+      - key: DATABASE_URL
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      # Set this AFTER you know your Vercel frontend URL
+      # e.g. https://cloth-rental.vercel.app
+      - key: CLIENT_URL
+        sync: false
